@@ -128,7 +128,7 @@ class App extends React.Component {
         const signer = provider.getSigner();
 
         let arcadeContract = new ethers.Contract(arcadeAddress, arcadeABI, signer);
-        arcadeContract.buyCredit(ethers.utils.parseEther("5"))
+        arcadeContract.buyCredit(ethers.utils.parseEther("1"))
       }else{
         console.log("Ethereum object does not exist");
       }
