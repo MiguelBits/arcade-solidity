@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html{
+  background-image: url(https://t3.ftcdn.net/jpg/02/58/99/42/360_F_258994216_zu9hTrycqkUa3GMpB58HtcXaiEQfKMs9.jpg);
+  background-size: cover;
+}
