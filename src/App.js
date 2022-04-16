@@ -22,7 +22,39 @@ class App extends React.Component {
           blockExplorerUrls: ["https://testnet.arbiscan.io/"]
       },
     },
+    creditBalance: 0,
+    magicBalance: 0,
   }
+
+  componentDidMount() {
+    this.getBalances()
+  }
+
+  getBalances = async () => {
+    const { ethereum } = window;
+    if (ethereum) {
+      
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const accounts = await provider.listAccounts();
+
+      const creditContract = new ethers.Contract(creditAddress, creditABI, signer);
+      await creditContract.balanceOf(accounts[0]).then((result ) =>{
+        //console.log(result)
+        this.setState({creditBalance : ethers.utils.formatEther(result).slice(0,6)});
+      })
+
+      const magicContract = new ethers.Contract(tokenAddress, tokenABI, signer);
+      await magicContract.balanceOf(accounts[0]).then((result ) =>{
+        //console.log(result)
+        this.setState({magicBalance : ethers.utils.formatEther(result).slice(0,6)});
+      })
+        
+    }else{
+      console.log("Ethereum object does not exist");
+    }
+  }
+
   handleNetworkSwitch = async () => {
     try {
       if (!window.ethereum) throw new Error("No crypto wallet found");
@@ -86,6 +118,34 @@ class App extends React.Component {
         console.log("Ethereum object does not exist");
       }
   }
+  buyTokens = async () =>{
+    const { ethereum } = window;
+      if (ethereum) {
+        
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        let arcadeContract = new ethers.Contract(arcadeAddress, arcadeABI, signer);
+        arcadeContract.buyCredit(ethers.utils.parseEther("5"))
+      }else{
+        console.log("Ethereum object does not exist");
+      }
+  }
+  approveToken = async() => {
+    const { ethereum } = window;
+      if (ethereum) {
+        
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
+        let txn = await tokenContract.approve(arcadeAddress,ethers.utils.parseEther("5"))
+        txn.wait()
+        //window.location.reload(false);
+      }else{
+        console.log("Ethereum object does not exist");
+      }
+  }
   canPlay = async () => {
     const { ethereum } = window;
       if (ethereum) {
@@ -123,7 +183,9 @@ class App extends React.Component {
             <img className="mx-auto" src="https://www.pngplay.com/wp-content/uploads/6/Arcade-Machine-Icon-PNG.png" alt="arcade" />
         </div>    
 
-        <button type="button" id="red" className="rounded-full focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Buy Credits</button>
+        <button type="button" id="red" onClick={this.buyTokens} className="rounded-full focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Buy Credits</button>
+
+        <button type="button" id="blue" onClick={this.approveToken} className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Approve Magic</button>
 
         <button id="network" onClick={this.handleNetworkSwitch} className='text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2'>
               Connect to Arbitrum
@@ -131,7 +193,7 @@ class App extends React.Component {
 
         {this.canPlay ? 
         <button id="yellow" className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400" >
-          <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+          <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Play Game
           </span>
         </button>
@@ -140,6 +202,13 @@ class App extends React.Component {
           Play Game</button>
         }
         
+        <div>
+          <span id="magic" className="bg-pink-100 text-pink-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">Magic Balance: {this.state.magicBalance}</span>
+        </div>
+        <div>
+          <span id="credit" className="bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">Credit Balance: {this.state.creditBalance}</span>
+        </div>
+
 
       </div>
     );

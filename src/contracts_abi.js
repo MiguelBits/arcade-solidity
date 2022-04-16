@@ -1,6 +1,6 @@
-export const tokenAddress = "";
-export const arcadeAddress = "";
-export const creditAddress = "";
+export const tokenAddress = "0x5Ba2Bcd3e7d6667A0db8630ef94373F65C88c57C";
+export const arcadeAddress = "0xF7ae2B2818bc5ed44aba33B80Df0b6d56e46eC5b";
+export const creditAddress = "0xEc2bbd38bEf7631a8D7204CcB97A0Ee75a9d4c34";
 
 export const tokenABI = [
 	{

@@ -2,15 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./CreditToken.sol";
 
 contract Arcade {
-    address CreditToken;
-    address MagicToken;
+    address CreditTokenAddress;
+    address MagicTokenAddress;
     address admin;
+    mapping(address => uint) timerPlayer;
+    mapping(address => bool) playerPaid;
 
     constructor(address _MagicToken){
         admin = msg.sender;
-        MagicToken = _MagicToken;
+        MagicTokenAddress = _MagicToken;
     }
 
     modifier onlyAdmin{
@@ -18,15 +21,32 @@ contract Arcade {
         _;
     }
 
-    function addCreditAddress(address _token) public onlyAdmin{
-        CreditToken = _token;
+    function addCreditAddress(address _token) public onlyAdmin(){
+        CreditTokenAddress = _token;
     }
 
     function buyCredit(uint _amount) public {
-        require(_amount % 5 == 0, "Required Magic tokens amount to be divisible by 5!");
-        ERC20 magic = ERC20(MagicToken);
-        require(magic.balanceOf(msg.sender) >= _amount, "Required sender to have amount of tokens in wallet!");
-        
+        require(_amount >= 1 && _amount <= 10, "Required to buy at least 1 token and maximum of 10 tokens!");
+        ERC20 magic = ERC20(MagicTokenAddress);
+        require(magic.balanceOf(msg.sender) >= _amount * 5 ether, "Required sender to have amount of tokens in wallet!");
+        //require(magic.allowance(msg.sender, address(this) ) >= _amount, "Required to approve amount of magic tokens to this contract allowance!");
+        magic.transferFrom(msg.sender, address(this), _amount * 5 ether);
+        CreditToken credit = CreditToken(CreditTokenAddress);
+        credit.mint(msg.sender, _amount * 10**18);
+    }
+
+    function playGame() public{
+        CreditToken credit = CreditToken(CreditTokenAddress);
+        require(credit.balanceOf(msg.sender) >= 1 ether, "You need at least 1 credit token to play!");
+        credit.burn(msg.sender, 1 ether);
+
+        playerPaid[msg.sender] = true;
+        timerPlayer[msg.sender] = block.timestamp;
+
+    }
+    function endGame(address _user) public onlyAdmin(){
+        playerPaid[_user] = false;
+        timerPlayer[_user] = 0;
     }
 
 

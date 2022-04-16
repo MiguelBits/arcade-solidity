@@ -19,6 +19,13 @@
   margin-right: -50%;
   transform: translate(-50%, -50%);
 }
+#blue{
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
 #yellow{
   position: absolute;
   top: 30%;
@@ -33,4 +40,18 @@
   margin-right: -50%;
   transform: translate(-50%, -50%);
   color: black;
+}
+#credit{
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+#magic{
+  position: absolute;
+  top: 10%;
+  left: 80%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
 }
