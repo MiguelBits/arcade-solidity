@@ -49,5 +49,9 @@ contract Arcade {
         timerPlayer[_user] = 0;
     }
 
+    function withdrawMagic() external onlyAdmin(){
+        ERC20 magic = ERC20(MagicTokenAddress);
+        magic.transfer(payable(admin),magic.balanceOf(admin));
+    }
 
 }
