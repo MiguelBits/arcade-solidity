@@ -1,7 +1,10 @@
 import './App.css';
 import React from 'react';
 import { ethers } from 'ethers';
-import {tokenAddress, tokenABI, arcadeAddress, arcadeABI, erc20ABI} from "./contracts_abi"
+import {
+  tokenAddress, tokenABI, 
+  arcadeAddress, arcadeABI, 
+  creditAddress, creditABI} from "./contracts_abi";
 
 class App extends React.Component {
   state = {
@@ -68,7 +71,7 @@ class App extends React.Component {
         console.log("No authorized account found");
     }
   }
-  mintToken = async (item) =>{
+  mintToken = async () =>{
     const { ethereum } = window;
       if (ethereum) {
         
@@ -84,13 +87,31 @@ class App extends React.Component {
       }
   }
   canPlay = async () => {
+    const { ethereum } = window;
+      if (ethereum) {
+        
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
+        let creditContract = new ethers.Contract(creditAddress, creditABI, signer);
+        creditContract.balanceOf(accounts[0]).then(balance =>{
+          if(balance >= ethers.utils.parseEther("1")){
+            return true;
+          }
+          else{
+            return false;
+          }
+        })
+      }else{
+        console.log("Ethereum object does not exist");
+      }
   }
 
   render() {
     return (
       <div>
-        <button type="button" id="green" className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Mint Magic Test Token
+        <button type="button" id="green" onClick={this.mintToken} className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Mint Magic Test Token
         </button>
 
         <button onClick={this.connectWalletHandler} type="button" id="metamask" className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-20 py-5 text-center inline-flex items-center dark:focus:ring-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
@@ -108,11 +129,17 @@ class App extends React.Component {
               Connect to Arbitrum
         </button>          
 
-        <button id="yellow" className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400" disabled>
+        {this.canPlay ? 
+        <button id="yellow" className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400" >
           <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Play Game
           </span>
         </button>
+        :
+        <button id="yellow" onClick={alert("Buy tokens first!")} type="button" className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+          Play Game</button>
+        }
+        
 
       </div>
     );
