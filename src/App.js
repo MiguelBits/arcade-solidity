@@ -24,10 +24,12 @@ class App extends React.Component {
     },
     creditBalance: 0,
     magicBalance: 0,
+    canPlay: false,
   }
 
   componentDidMount() {
     this.getBalances()
+    this.canPlay()
   }
 
   getBalances = async () => {
@@ -156,16 +158,36 @@ class App extends React.Component {
 
         let creditContract = new ethers.Contract(creditAddress, creditABI, signer);
         creditContract.balanceOf(accounts[0]).then(balance =>{
-          if(balance >= ethers.utils.parseEther("1")){
-            return true;
+          if(parseInt(balance.toString()) > 0){
+            this.setState({canPlay:true})
           }
           else{
-            return false;
+            this.setState({canPlay:false})
           }
         })
       }else{
         console.log("Ethereum object does not exist");
       }
+  }
+  playGame = async () => {
+    if(this.state.canPlay){
+      const { ethereum } = window;
+      if (ethereum) {
+        
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        let creditContract = new ethers.Contract(creditAddress, creditABI, signer);
+        creditContract.playGame()
+        
+      }else{
+        console.log("Ethereum object does not exist");
+      }
+    }
+    else{
+      alert("You need to buy tokens first.")
+    }
+    
   }
 
   render() {
@@ -191,14 +213,14 @@ class App extends React.Component {
               Connect to Arbitrum
         </button>          
 
-        {this.canPlay ? 
-        <button id="yellow" className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400" >
+        {this.state.canPlay ? 
+        <button id="yellow" onClick={this.playGame} className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400" >
           <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Play Game
           </span>
         </button>
         :
-        <button id="yellow" onClick={alert("Buy tokens first!")} type="button" className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+        <button id="yellow" onClick={this.playGame} type="button" className="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
           Play Game</button>
         }
         
