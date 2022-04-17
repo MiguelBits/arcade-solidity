@@ -54,4 +54,15 @@ contract Arcade {
         magic.transfer(payable(admin),magic.balanceOf(admin));
     }
 
+    function playerCanPlay() public returns (bool isValid) {
+        if(playerPaid[msg.sender]){
+            if(timerPlayer[msg.sender] > 0 && block.timestamp <= timerPlayer[msg.sender]+190){
+                return true;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
 }
