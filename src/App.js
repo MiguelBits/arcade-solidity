@@ -177,8 +177,8 @@ class App extends React.Component {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
-        let creditContract = new ethers.Contract(creditAddress, creditABI, signer);
-        creditContract.playGame()
+        let arcadeContract = new ethers.Contract(arcadeAddress, arcadeABI, signer);
+        arcadeContract.playGame()
         
       }else{
         console.log("Ethereum object does not exist");
