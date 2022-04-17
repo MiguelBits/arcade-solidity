@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract CreditToken is ERC20 {
     address factory;
+
     modifier onlyFactory(){
         require(factory == msg.sender);
         _;
@@ -18,14 +19,10 @@ contract CreditToken is ERC20 {
         _mint(msg.sender, 100 ether);//100ether
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public virtual override returns (bool) {
-        return false;
+    function mint(address _who, uint _howmuch) public onlyFactory(){
+        _mint(_who,_howmuch);
     }
-    function transfer(address to, uint256 amount) public virtual override returns (bool) {
-        return false;
+    function burn(address _sender, uint _amount) external onlyFactory(){
+        _burn(_sender,_amount);
     }
 }
